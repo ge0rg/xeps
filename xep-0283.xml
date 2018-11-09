@@ -8,7 +8,7 @@
 <xep>
 <header>
   <title>Moved</title>
-  <abstract>This document defines an XMPP protocol extension that enables a user to inform its contacts about a change in JID.</abstract>
+  <abstract>This document defines an XMPP protocol extension that enables a user to inform their contacts about a change in JID.</abstract>
   &LEGALNOTICE;
   <number>0283</number>
   <status>Experimental</status>

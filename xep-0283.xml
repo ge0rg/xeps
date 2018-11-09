@@ -114,7 +114,7 @@
   </ul>
 </section1>
 
-<section1 topic='The Move'>
+<section1 topic='The Move' anchor='move'>
   <p>In this scenario user@example.com moves to user2@example2.com.
     Both the user@example.com and user2@example2.com accounts have been
     created and still exist. The roster for user2@example2.com is empty
@@ -136,7 +136,7 @@
             anchor='unsubscribe'>
     <p>Because the original JID is no longer going to be used, the user SHOULD
     unsubscribe from all the outbound subscriptions user@example.com had.
-    These can be identified as those in the 'to' or 'ask' states as
+    These can be identified as those in the 'both', 'to' or 'ask' states as
     defined in the 'jabber:iq:roster' protocol in <cite>RFC 6121</cite>.</p>
 
     <p>To unsubscribe all outbound subscriptions for the original JID send an
@@ -163,7 +163,7 @@
             anchor='unsubscribed'>
     <p>Because the original JID is no longer going to be used, the user SHOULD
     unsubscribe from all contacts the user@example.com had an inbound
-    subscription from. These can be identified as those in the 'from'
+    subscription from. These can be identified as those in the 'both' or 'from'
     subscription state as defined in in the 'jabber:iq:roster' protocol
     in <cite>RFC 6121</cite>.</p>
 
@@ -193,7 +193,7 @@
       <p>Once the new JID has been created on a server it is possible for the
       new JID to subscribe to the contacts they had on the original JID's
       roster. This is done by sending a new subscription request with a
-      &MOVED; element containing the new JID.
+      &MOVED; element containing the old JID.
       </p>
 
       <p>The new subscription MUST come from the new JID's server.</p>
@@ -388,7 +388,8 @@
   receives an unsubscribe and SHOULD NOT automatically unsubscribe to
   a &MOVED; JID when it receives a subscribe.</p>
 
-  <p>The following illustrates an example malicious attack.</p>
+  <p>The following illustrates an example attack on a client that does not
+  await confirmation from the new account.</p>
 
   <ol>
   <li>userA@example.com subscribes to userB@example.com</li>
@@ -396,13 +397,13 @@
       userA@example.com. (Automatically done by the client using a simple
       domain trust).</li>
   <li>userA@example.com unsubscribes with the &MOVED; 'new' JID set to
-      companyCEO@example.com.</li>
+      companyCEO@example.com, which is then erroneously added to userB's roster.</li>
   <li>The previous steps can be repeated and have userB@example.com subscribe
       to a large number of people.</li>
   </ol>
 
- <p>A similar attack can be done with a new subscribe request causing users
-  by guessing which users are subscribed to a contact.</p>
+ <p>A similar attack can be performed with a client that does not require
+ confirmation from the old account, by guessing existing roster items.</p>
 
   <ol>
   <li>hacker@example.com subscribes to userB@example.com guessing that

@@ -104,13 +104,15 @@
   <p>This XEP defines an approach for communicating that your JID has
   moved to a new JID, extending the existing subscription protocol documented
   in &xmppim;. The steps outlined here may be done either through a client
-  or automated by a server.
+  or automated by a server. By demonstrating the ownership of both accounts, you
+  can initiate an automatic update of your JID at all of your contacts.
   </p>
 </section1>
 
 <section1 topic='Requirements' anchor='reqs'>
   <ul>
     <li>The methods described here maintain compatibility with &xmppcore; and <cite>RFC 6121</cite>.</li>
+    <li>An automatic contact change is only possible with contacts that have bi-directional presence subscription.</li>
   </ul>
 </section1>
 
@@ -144,11 +146,12 @@
     element containing the new JID.</p>
 
     <p>There is the potential for other users to send a malicious unsubscribe
-    containing a spoofed &MOVED; JID. Therefore, clients SHOULD NOT
-    automatically subscribe to the JID contained in the &MOVED; stanza when
-    receiving a subscribe &PRESENCE; stanza without displaying the &MOVED;
-    JID to the user. See the Security Considerations section for
-    details.</p>
+    containing a spoofed &MOVED; JID. Therefore, clients MUST NOT
+    automatically subscribe to the 'new' JID contained in the &MOVED; stanza when
+    receiving an unsubscribe &PRESENCE; stanza. Instead, they need to await
+    the subscribe &PRESENCE; from the new JID and verify that it contains a
+    &MOVED; element with the corresponding 'old' JID.
+    </p>
 
     <example caption='Client unsubscribes outbound subscriptions from original JID'><![CDATA[
 <presence from='user@example.com' to='contact@example.com' type='unsubscribe'>
@@ -172,10 +175,12 @@
     containing the new JID.</p>
 
     <p>There is the potential for other users to send a malicious unsubscribed
-    containing a spoofed &MOVED; JID. Therefore, clients SHOULD NOT
-    automatically subscribe to the JID contained in the &MOVED; stanza
-    without displaying the &MOVED; JID to the user. See the Security
-    Considerations section for details.</p>
+    containing a spoofed &MOVED; JID. Therefore, clients MUST NOT
+    automatically subscribe to the 'new' JID contained in the &MOVED; stanza when
+    receiving an unsubscribed &PRESENCE; stanza. Instead, they need to await
+    the subscribe &PRESENCE; from the new JID and verify that it contains a
+    &MOVED; element with the corresponding 'old' JID.
+    </p>
 
     <example caption='Client unsubscribes inbound subscriptions from original JID'>
 <![CDATA[
@@ -196,20 +201,17 @@
       &MOVED; element containing the old JID.
       </p>
 
-      <p>The new subscription MUST come from the new JID's server.</p>
-
       <p>There is the potential for other users to send a malicious subscribe
       request and spoof the content of the &MOVED; element identifying an
       original JID. Therefore, clients SHOULD NOT automatically unsubscribe
-      an existing roster entry if is listed as the target in the &MOVED;
-      element when a subscribe is received. See the Security
+      an existing roster entry if is listed as the old JID in the &MOVED;
+      element of a subscribe request. See the Security
       Consideration section for details.</p>
 
       <p>Clients accepting the moved subscription SHOULD indicate to the
       user that that this subscription request was the result of a move
-      operation and because of potential malicious behavior SHOULD NOT
-      auto-accept the subscription without displaying the &MOVED; JID to the
-      user.</p>
+      operation and should indicate the old JID to the user.
+      </p>
 
       <example caption='Client requests subscription from new JID'>
   <![CDATA[
@@ -386,7 +388,10 @@
   <p>In order to prevent other users from maliciously altering contacts
   the client SHOULD NOT automatically subscribe to a &MOVED; JID when it
   receives an unsubscribe and SHOULD NOT automatically unsubscribe to
-  a &MOVED; JID when it receives a subscribe.</p>
+  a &MOVED; JID when it receives a subscribe. Only if a client received
+  reciprocal &MOVED; elements from both accounts, an automatic subscription
+  change MAY be performed. In that case, the user should be informed about
+  the JID change.</p>
 
   <p>The following illustrates an example attack on a client that does not
   await confirmation from the new account.</p>

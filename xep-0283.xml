@@ -29,6 +29,12 @@
     <jid>tpatnoe@cisco.com</jid>
   </author>
   <revision>
+    <version>0.2</version>
+    <date>2018-11-09</date>
+    <initials>gl</initials>
+    <remark><p>Significant rewrite to make a secure automatic transfer possible</p></remark>
+  </revision>
+  <revision>
     <version>0.1.1</version>
     <date>2018-08-06</date>
     <initials>pep</initials>
@@ -116,7 +122,7 @@
   </ul>
 </section1>
 
-<section1 topic='The Move' anchor='move'>
+<section1 topic='Performing the Move' anchor='move'>
   <p>In this scenario user@example.com moves to user2@example2.com.
     Both the user@example.com and user2@example2.com accounts have been
     created and still exist. The roster for user2@example2.com is empty
@@ -134,6 +140,33 @@
     </di>
   </dl>
 
+  <p>The following steps need to be performed by the user's client(s) on each
+    roster item to complete a move.</p>
+
+  <section2 topic='Notifying the contacts of the move'
+            anchor='message'>
+    <p><cite>RFC 6121</cite> does not mandate the persistent storage of
+      'unsubscribe' or 'unsubscribed' stanzas. Therefore, to ensure that this
+      information arrives at all contacts, the client SHOULD send a &MESSAGE;
+      from the old account to all roster items, containing a &MOVED; element
+      referencing the new account.
+    </p>
+
+    <example caption='Client sends Moved notification from original JID'><![CDATA[
+<message from='user@example.com/client' to='contact@example.com' type='chat'>
+    <body>I've changed JIDs from user@example.com to user2@example2.com</body>
+    <moved xmlns='urn:xmpp:moved:0' new='user2@example2.com'/>
+</message>
+]]></example>
+    <p>The &MESSAGE; should be of type 'chat' or 'normal', be addressed to the
+      bare JID of the contact and contain a &BODY; element to ensure that it is
+      delivered to all connected clients or stored in offline storage.</p>
+
+    <p>The &BODY; MUST NOT contain information unrelated to the account move.
+      This allows a receiving client that understands the &MOVED; element to
+      discard the &BODY; and use an appropriate internal presentation format.
+    </p>
+  </section2>
   <section2 topic='Unsubscribing the original JID from outbound subscriptions'
             anchor='unsubscribe'>
     <p>Because the original JID is no longer going to be used, the user SHOULD
@@ -380,11 +413,28 @@
   </section2>
 </section1>
 
+<section1 topic='The Partial Move' anchor='partial-move'>
+
+</section1>
+
 <section1 topic='Security Considerations' anchor='security'>
+
+<section2 topic='Generic Considerations' anchor='generic'>
   <p>It is not intended for servers to strip any &MOVED; elements from
   &PRESENCE; stanzas sent in from a client. This allows clients as well as
   servers to implement these same procedures.</p>
 
+  <p>If an account has a roster managed by external policy (e.g. based on
+  corporate user groups), this policy MUST be enforced when performing any
+  roster changes caused by this specification.</p>
+
+
+  <p>An entity MUST NOT process &MOVED; elements that reference a full JID
+  (containing a non-empty resource part).</p>
+
+</section2>
+
+<section2 topic='Verification of Legitimacy' anchor='verification'>
   <p>In order to prevent other users from maliciously altering contacts
   the client SHOULD NOT automatically subscribe to a &MOVED; JID when it
   receives an unsubscribe and SHOULD NOT automatically unsubscribe to
@@ -426,7 +476,7 @@
   the roster.
   </li>
   </ol>
-
+</section2>
 </section1>
 
 <section1 topic='IANA Considerations' anchor='iana'>
